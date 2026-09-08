@@ -1,0 +1,30 @@
+# Big firmware/proprietary binaries — never commit
+stock_firmware/*.7z
+stock_firmware/*.bin
+stock_firmware/*.tar*
+stock_firmware/unpacked/*.fw
+stock_firmware/unpacked/*.raw
+stock_firmware/unpacked/*_rootfs/
+stock_firmware/kernel/*.bin
+stock_firmware/kernel/*.gz
+stock_firmware/kernel/*.cpio
+
+# GPL sources fetched from Huawei mirror (re-download via CI)
+gpl_source/*.tar
+gpl_source/*.tar.gz
+gpl_source/android-2.6.35/
+gpl_source/source/
+
+# Third-party tool clones
+tools/balongflash/
+tools/modfw_kitchen/
+tools/yaffshiv/
+
+# Python/venv artifacts
+__pycache__/
+*.pyc
+
+# Build output
+workdir/
+out/
+*.log
