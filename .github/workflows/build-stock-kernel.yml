@@ -12,13 +12,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y bison flex libssl-dev bc cpio gcc make p7zip-full
-      - name: Download cross toolchain (gcc 4.4.1 arm-none-linux-gnueabi)
+      - name: Download cross toolchain (Sourcery 2010q1, gcc 4.5.1)
         run: |
           curl -sL -o tc.tar.bz2 \
-            "https://github.com/RunningFruits/arm-none-linux-gnueabi-gcc-files/raw/master/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2"
+            "https://downloads.sourceforge.net/project/iadfilehost/devtools/arm-2010q1-202-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2"
           tar xjf tc.tar.bz2 -C $HOME
-          TOOLCHAIN=$HOME/arm-2009q1/arm-none-linux-gnueabi
-          $TOOLCHAIN/bin/arm-none-linux-gnueabi-gcc --version
+          TOOLCHAIN=$HOME/arm-2010q1
+          $TOOLCHAIN/bin/arm-none-linux-gnueabi-gcc --version | head -1
           echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
           echo "$TOOLCHAIN/bin" >> $GITHUB_PATH
       - name: Download GPL source from Release
@@ -44,9 +44,6 @@ jobs:
           export FEATURE_WIFI=FEATURE_ON
           export INCLUDE_FLAG="-I./include/linux"
           make hisi_balong_hi6920cs_e5776s_defconfig 2>&1 | tail -30
-          echo "=== config diff vs stock ==="
-          diff arch/arm/configs/hisi_balong_hi6920cs_e5776s_defconfig \
-               "$GITHUB_WORKSPACE/docs/stock_kernel_config_2.6.35.7.txt" 2>&1 | head -60 || true
       - name: Build kernel
         run: |
           cd android-2.6.35
