@@ -25,13 +25,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          curl -sL -H "Authorization: token $GH_TOKEN" -o gpl.tar.gz \
-            "https://github.com/bibibi-Matrix/e5372-android-3.10/releases/download/gpl-test/E5372_GPL_Code.tar.gz"
-          ls -la gpl.tar.gz
-          file gpl.tar.gz || true
-          7z x gpl.tar.gz -y >/dev/null 2>&1 || true
-          7z x gpl.tar -y >/dev/null 2>&1 || true
-          ls -d android-2.6.35 2>&1 || true
+          gh release download gpl-test --pattern "*.tar.gz" --clobber
+          ls -la gpl.tar.gz 2>/dev/null || ls -la E5372_GPL_Code.tar.gz
+          7z x *.tar.gz -y >/dev/null 2>&1 || true
+          7z x *.tar -y >/dev/null 2>&1 || true
+          test -d android-2.6.35 && echo "GPL extracted OK"
       - name: Patch EXTRAVERSION (harmless)
         run: |
           cd android-2.6.35
