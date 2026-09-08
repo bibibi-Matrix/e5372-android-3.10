@@ -19,6 +19,7 @@ jobs:
           curl -sL -o gpl.tar.gz \
             "https://github.com/bibibi-Matrix/e5372-android-3.10/releases/download/gpl-test/E5372_GPL_Code.tar.gz"
           7z x gpl.tar.gz -y >/dev/null 2>&1 || true
+          7z x gpl.tar -y >/dev/null 2>&1 || true
           ls -la
       - name: Patch for modern GCC builds (2.6.35-era kernel)
         run: |
