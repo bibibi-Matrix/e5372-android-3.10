@@ -15,12 +15,16 @@ jobs:
             binutils-arm-linux-gnueabi bison flex libssl-dev bc cpio gcc make p7zip-full
           arm-linux-gnueabi-gcc --version | head -1
       - name: Download GPL source from Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          curl -sL -o gpl.tar.gz \
+          curl -sL -H "Authorization: token $GH_TOKEN" -o gpl.tar.gz \
             "https://github.com/bibibi-Matrix/e5372-android-3.10/releases/download/gpl-test/E5372_GPL_Code.tar.gz"
+          ls -la gpl.tar.gz
+          file gpl.tar.gz || true
           7z x gpl.tar.gz -y >/dev/null 2>&1 || true
           7z x gpl.tar -y >/dev/null 2>&1 || true
-          ls -la
+          ls -d android-2.6.35 2>&1 || true
       - name: Patch for modern GCC builds (2.6.35-era kernel)
         run: |
           cd android-2.6.35
