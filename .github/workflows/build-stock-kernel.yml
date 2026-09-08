@@ -17,7 +17,7 @@ jobs:
           curl -sL -o tc.tar.bz2 \
             "https://github.com/RunningFruits/arm-none-linux-gnueabi-gcc-files/raw/master/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2"
           tar xjf tc.tar.bz2 -C $HOME
-          TOOLCHAIN=$HOME/arm-2009q1-203
+          TOOLCHAIN=$HOME/arm-2009q1/arm-none-linux-gnueabi
           $TOOLCHAIN/bin/arm-none-linux-gnueabi-gcc --version
           echo "TOOLCHAIN=$TOOLCHAIN" >> $GITHUB_ENV
           echo "$TOOLCHAIN/bin" >> $GITHUB_PATH
