@@ -48,9 +48,14 @@ jobs:
           export ARCH=arm
           export CROSS_COMPILE=arm-none-linux-gnueabi-
           export FEATURE_WIFI=FEATURE_ON
-          make -j$(nproc) BOARD_TYPE=BOARD_ASIC VERSION_TYPE=CHIP_BB_6920CS \
-            PRODUCT_CFG_BUILD_TYPE= 2>&1 | tee "$GITHUB_WORKSPACE/build.log" | tail -80
-          test -f arch/arm/boot/zImage && echo "=== ZIMAGE OK ===" || echo "=== ZIMAGE MISSING ==="
+          set -o pipefail
+          make -j4 BOARD_TYPE=BOARD_ASIC VERSION_TYPE=CHIP_BB_6920CS \
+            PRODUCT_CFG_BUILD_TYPE= > "$GITHUB_WORKSPACE/build.log" 2>&1
+          rc=$?
+          echo "=== make exit code: $rc ==="
+          tail -60 "$GITHUB_WORKSPACE/build.log"
+          if [ -f arch/arm/boot/zImage ]; then echo "=== ZIMAGE OK ==="; else echo "=== ZIMAGE MISSING ==="; fi
+          exit $rc
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
