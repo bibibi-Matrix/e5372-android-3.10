@@ -12,13 +12,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-arm-linux-gnueabi gcc-10-arm-linux-gnueabi \
-            binutils-arm-linux-gnueabi bison flex libssl-dev bc cpio gcc make
+            binutils-arm-linux-gnueabi bison flex libssl-dev bc cpio gcc make p7zip-full
           arm-linux-gnueabi-gcc --version | head -1
       - name: Download GPL source from Release
         run: |
           curl -sL -o gpl.tar.gz \
             "https://github.com/bibibi-Matrix/e5372-android-3.10/releases/download/gpl-test/E5372_GPL_Code.tar.gz"
-          tar xzf gpl.tar.gz -C . 2>&1 | head -5
+          7z x gpl.tar.gz -y >/dev/null 2>&1 || true
           ls -la
       - name: Patch for modern GCC builds (2.6.35-era kernel)
         run: |
