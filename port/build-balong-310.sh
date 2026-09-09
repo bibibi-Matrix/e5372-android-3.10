@@ -31,7 +31,8 @@ scripts/config \
     --enable BALONG_OM \
     --enable BALONG_MEMORY_SPINLOCK \
     --enable HAS_BALONG_DEBUG_UART_PHYS \
-    --enable BALONG_DEBUG_UART0
+    --enable BALONG_DEBUG_UART0 \
+    --enable ARM_GIC
 make olddefconfig
 
 echo "=== sanity checks ==="
