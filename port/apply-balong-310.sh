@@ -79,6 +79,20 @@ else
     echo "arch/arm/Makefile: balong machine hook already present"
 fi
 
+# --- 4b. top-level Makefile: balong -D board/chip flags ---------------------
+# Vanilla 3.10 does not know BOARD_TYPE/VERSION_TYPE; the GPL features rely on
+# -DBOARD_ASIC -DCHIP_BB_6920CS (fixed E5372 / hi6920cs_asic target).
+if ! grep -q "\-DBOARD_ASIC \-DCHIP_BB_6920CS" Makefile; then
+    cat >> Makefile <<'EOF'
+
+# --- balong platform flags (E5372 / hi6920cs_asic) ---
+KBUILD_CFLAGS += -DBOARD_ASIC -DCHIP_BB_6920CS
+EOF
+    echo "Makefile: balong -D flags added"
+else
+    echo "Makefile: balong -D flags already present"
+fi
+
 # --- 5. minimal defconfig ---------------------------------------------------
 if [ ! -f arch/arm/configs/balong_min_defconfig ]; then
     cat > arch/arm/configs/balong_min_defconfig <<'EOF'

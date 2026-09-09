@@ -34,7 +34,9 @@ scripts/config \
 make olddefconfig
 
 set +e
-make -j4 zImage HOSTCFLAGS="-fcommon" > "$GITHUB_WORKSPACE/balong-310.log" 2>&1
+make -j4 zImage HOSTCFLAGS="-fcommon" \
+    BOARD_TYPE=BOARD_ASIC VERSION_TYPE=CHIP_BB_6920CS \
+    > "$GITHUB_WORKSPACE/balong-310.log" 2>&1
 rc=$?
 set -e
 
