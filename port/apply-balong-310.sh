@@ -43,6 +43,17 @@ else
     echo "drivers/include: already present"
 fi
 
+# mach-balong/product_info references -Idrivers/mtd/nand/{ptable,nandc} for
+# ptable_def.h etc.; vanilla 3.10 has neither directory.
+if [ ! -d drivers/mtd/nand/ptable ]; then
+    cp -r "$GPL/drivers/mtd/nand/ptable" drivers/mtd/nand/ptable
+    echo "drivers/mtd/nand/ptable: copied"
+fi
+if [ ! -d drivers/mtd/nand/nandc ]; then
+    cp -r "$GPL/drivers/mtd/nand/nandc" drivers/mtd/nand/nandc
+    echo "drivers/mtd/nand/nandc: copied"
+fi
+
 # --- 2. balong generated headers (FeatureConfig, MemoryMap, BSP_*) --------
 mkdir -p include/generated
 for f in BSP_GLOBAL.h BSP_IPF.h BSP_MEMORY.h BSP_VERSION.h DrvInterface.h \
@@ -160,6 +171,13 @@ extern void __init vic_init(void __iomem *base, unsigned int irq_start,
 EOF
     echo "compat vic.h: created"
 fi
+
+# --- 4c. kbuild flag renames for copied balong Makefiles ---------------------
+# 3.10 moved EXTRA_CFLAGS to ccflags-y (EXTRA_CFLAGS is dead there); without
+# this the -I... flags in product_info/Makefile are silently ignored.
+find arch/arm/mach-balong -name Makefile -exec \
+    sed -i 's/EXTRA_CFLAGS/ccflags-y/' {} \;
+echo "mach-balong Makefiles: EXTRA_CFLAGS renamed to ccflags-y"
 
 # --- 4d. machine_desc / mem-types compatibility for 3.10 ----------------------
 # 3.10 dropped .phys_io/.io_pg_offst/.boot_params/.timer, replaced sys_timer by
