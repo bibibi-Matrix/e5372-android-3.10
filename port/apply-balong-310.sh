@@ -94,8 +94,9 @@ if ! grep -q "\-DBOARD_ASIC \-DCHIP_BB_6920CS" Makefile; then
 # --- balong platform flags (E5372 / hi6920cs_asic) ---
 KBUILD_CFLAGS += -DBOARD_ASIC -DCHIP_BB_6920CS
 KBUILD_CPPFLAGS += -Iarch/arm/mach-balong/include
+KBUILD_CPPFLAGS += -Idrivers/include
 EOF
-    echo "Makefile: balong -D flags + mach include added"
+    echo "Makefile: balong -D flags + include dirs added"
 else
     echo "Makefile: balong -D flags already present"
 fi
