@@ -113,16 +113,23 @@ fi
 
 # pwrctrl/sleepMgr reaches the balong driver headers via "../drivers/...";
 # mirror them under pwrctrl/drivers so the relative include resolves.
-for rel in rtc/balong_rtc.h \
-           input/keyboard/balong_keyboard/balong_kpd_parse.h \
-           led_drv/balong_led_drv.h; do
-    dst="arch/arm/mach-balong/pwrctrl/drivers/$rel"
-    if [ -f "$GPL/drivers/$rel" ] && [ ! -e "$dst" ]; then
+mirror_driver_dir() { # <gpl-rel-dir>
+    src="$GPL/drivers/$1"
+    dst="arch/arm/mach-balong/pwrctrl/drivers/$1"
+    if [ -d "$src" ] && [ ! -d "$dst" ]; then
         mkdir -p "$(dirname "$dst")"
-        cp "$GPL/drivers/$rel" "$dst"
-        echo "$dst: mirrored"
+        cp -r "$src" "$dst"
+        echo "$dst: mirrored from GPL drivers"
     fi
-done
+}
+mirror_driver_dir input/keyboard/balong_keyboard
+mirror_driver_dir led_drv
+dst="arch/arm/mach-balong/pwrctrl/drivers/rtc/balong_rtc.h"
+if [ -f "$GPL/drivers/rtc/balong_rtc.h" ] && [ ! -e "$dst" ]; then
+    mkdir -p "$(dirname "$dst")"
+    cp "$GPL/drivers/rtc/balong_rtc.h" "$dst"
+    echo "$dst: mirrored"
+fi
 
 # linux/sysdev.h was removed in 3.x; balong platform files still #include it
 # (mostly without using it). Provide a minimal empty shim.
