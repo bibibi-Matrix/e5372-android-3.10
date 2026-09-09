@@ -1,0 +1,30 @@
+name: port-310
+on:
+  workflow_dispatch:
+
+jobs:
+  probe-310:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bison flex libssl-dev bc cpio gcc make p7zip-full
+      - name: Download cross toolchain (Sourcery 2010q1, gcc 4.5.1)
+        run: |
+          curl -sL -o tc.tar.bz2 \
+            "https://downloads.sourceforge.net/project/iadfilehost/devtools/arm-2010q1-202-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2"
+          tar xjf tc.tar.bz2 -C $HOME
+          echo "$HOME/arm-2010q1/bin" >> $GITHUB_PATH
+          arm-none-linux-gnueabi-gcc --version | head -1
+      - name: Probe: build vanilla 3.10.108 (vexpress_defconfig)
+        run: bash port/probe-310.sh
+      - name: Upload probe log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-310-log
+          path: probe-310.log
+          if-no-files-found: warn
