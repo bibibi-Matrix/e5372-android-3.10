@@ -90,6 +90,40 @@ for h in "$GPL"/include/linux/BSP_*.h "$GPL"/include/linux/bsp_*.h \
     fi
 done
 
+# Balong driver trees that the platform code reaches through relative includes
+# ("../../../drivers/..." from mach-balong, "../drivers/..." from
+# pwrctrl/sleepMgr). Vanilla 3.10 lacks them; copy from the GPL tree.
+cp_driver_dir() { # <gpl-rel-dir>
+    src="$GPL/$1"
+    dst="$1"
+    if [ -d "$src" ] && [ ! -d "$dst" ]; then
+        cp -r "$src" "$dst"
+        echo "$1: copied from GPL drivers"
+    fi
+}
+cp_driver_dir drivers/led_drv
+cp_driver_dir drivers/mntn
+cp_driver_dir drivers/input/keyboard/balong_keyboard
+cp_driver_dir drivers/staging/balong_oled_emi
+cp_driver_dir drivers/staging/balong_tft_emi
+if [ -f "$GPL/drivers/rtc/balong_rtc.h" ] && [ ! -e "drivers/rtc/balong_rtc.h" ]; then
+    cp "$GPL/drivers/rtc/balong_rtc.h" drivers/rtc/balong_rtc.h
+    echo "drivers/rtc/balong_rtc.h: copied"
+fi
+
+# pwrctrl/sleepMgr reaches the balong driver headers via "../drivers/...";
+# mirror them under pwrctrl/drivers so the relative include resolves.
+for rel in rtc/balong_rtc.h \
+           input/keyboard/balong_keyboard/balong_kpd_parse.h \
+           led_drv/balong_led_drv.h; do
+    dst="arch/arm/mach-balong/pwrctrl/drivers/$rel"
+    if [ -f "$GPL/drivers/$rel" ] && [ ! -e "$dst" ]; then
+        mkdir -p "$(dirname "$dst")"
+        cp "$GPL/drivers/$rel" "$dst"
+        echo "$dst: mirrored"
+    fi
+done
+
 # linux/sysdev.h was removed in 3.x; balong platform files still #include it
 # (mostly without using it). Provide a minimal empty shim.
 if [ ! -f include/linux/sysdev.h ]; then
