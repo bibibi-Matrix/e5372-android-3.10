@@ -216,6 +216,15 @@ else
     echo "arch/arm/tools/mach-types: BALONG_V100R001 already present"
 fi
 
+# balong_core_v7r1asic.c carries its own clk_* (clk_enable/clk_disable/
+# clk_get_rate/clk_get/clk_put); with CONFIG_COMMON_CLK=y these collide with the
+# core clocks at link time (multiple definition). The CCF provides working
+# wrappers, so drop the balong copies.
+CORE_FILE=arch/arm/mach-balong/balong_core_v7r1asic.c
+perl -0pi -e 's/\n+int clk_enable[^\n]*\n.*?\nvoid clk_put[^\n]*\n\}\n(\n*)/\n/* clk_* stubs from 2.6 removed: CCF provides them in 3.10 *\/\n/s' \
+    "$CORE_FILE"
+echo "balong_core_v7r1asic.c: clk_* stubs removed (CCF conflict)"
+
 # --- 4e. top-level Makefile: balong -D board/chip flags ---------------------
 # Vanilla 3.10 does not know BOARD_TYPE/VERSION_TYPE; the GPL features rely on
 # -DBOARD_ASIC -DCHIP_BB_6920CS (fixed E5372 / hi6920cs_asic target).
