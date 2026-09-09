@@ -34,6 +34,8 @@ scripts/config \
     --enable BALONG_DEBUG_UART0 \
     --enable ARM_GIC \
     --enable GPIOLIB
+# DDR base of hi6920cs (mach/memory.h PHYS_OFFSET); zImage ZRELADDR follows it
+scripts/config --set-val PHYS_OFFSET 0x33f00000
 make olddefconfig
 
 echo "=== sanity checks ==="

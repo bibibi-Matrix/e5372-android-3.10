@@ -74,3 +74,12 @@ jobs:
           name: balong-310-zimage
           path: linux-3.10.108/arch/arm/boot/zImage
           if-no-files-found: warn
+      - name: Upload vmlinux and System.map if built
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: balong-310-vmlinux
+          path: |
+            linux-3.10.108/vmlinux
+            linux-3.10.108/System.map
+          if-no-files-found: warn
