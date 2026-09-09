@@ -104,6 +104,7 @@ cp_driver_dir() { # <gpl-rel-dir>
 cp_driver_dir drivers/led_drv
 cp_driver_dir drivers/mntn
 cp_driver_dir drivers/SoftTimer
+cp_driver_dir drivers/nvim
 cp_driver_dir drivers/input/keyboard/balong_keyboard
 cp_driver_dir drivers/staging/balong_oled_emi
 cp_driver_dir drivers/staging/balong_tft_emi
@@ -126,6 +127,7 @@ mirror_driver_dir() { # <gpl-rel-dir>
 mirror_driver_dir input/keyboard/balong_keyboard
 mirror_driver_dir led_drv
 mirror_driver_dir SoftTimer
+mirror_driver_dir nvim
 dst="arch/arm/mach-balong/pwrctrl/drivers/rtc/balong_rtc.h"
 if [ -f "$GPL/drivers/rtc/balong_rtc.h" ] && [ ! -e "$dst" ]; then
     mkdir -p "$(dirname "$dst")"
