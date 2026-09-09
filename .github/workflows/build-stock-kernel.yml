@@ -34,6 +34,7 @@ jobs:
         run: |
           cd android-2.6.35
           sed -i 's/^EXTRAVERSION = .7/EXTRAVERSION = .7-v8/' Makefile
+          sed -i 's/if (!defined(@val)) {/if (@val == 0) {/' kernel/timeconst.pl
       - name: Configure and build (try SDK defconfig)
         run: |
           cd android-2.6.35
