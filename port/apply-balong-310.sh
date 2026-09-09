@@ -78,6 +78,18 @@ for f in product_config.h vxprintk.h; do
     fi
 done
 
+# Balong-specific headers that 2.6 kept in include/linux/ (BSP_CHGC_DRV.h etc.).
+# Copy additively whatever 3.10 does not already have.
+for h in "$GPL"/include/linux/BSP_*.h "$GPL"/include/linux/bsp_*.h \
+         "$GPL"/include/linux/syswatch_*.h; do
+    [ -f "$h" ] || continue
+    n=$(basename "$h")
+    if [ ! -e "include/linux/$n" ]; then
+        cp "$h" "include/linux/$n"
+        echo "include/linux/$n: copied"
+    fi
+done
+
 # linux/sysdev.h was removed in 3.x; balong platform files still #include it
 # (mostly without using it). Provide a minimal empty shim.
 if [ ! -f include/linux/sysdev.h ]; then
