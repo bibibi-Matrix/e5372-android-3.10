@@ -1,0 +1,7 @@
+name: yaml-sanity
+on: push
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo hello
