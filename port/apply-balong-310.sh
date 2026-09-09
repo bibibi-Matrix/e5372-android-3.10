@@ -290,10 +290,15 @@ fi
 # balong_core_v7r1asic.c carries its own clk_* (clk_enable/clk_disable/
 # clk_get_rate/clk_get/clk_put); with CONFIG_COMMON_CLK=y these collide with the
 # core clocks at link time (multiple definition). The CCF provides working
-# wrappers, so drop the balong copies.
+# wrappers, so drop the balong copies. awk drops from the clk_enable signature
+# through the balanced closing brace of clk_put.
 CORE_FILE=arch/arm/mach-balong/balong_core_v7r1asic.c
-perl -0pi -e 's/\n+int clk_enable[^\n]*\n.*?\nvoid clk_put[^\n]*\n\}\n(\n*)/\n/* clk_* stubs from 2.6 removed: CCF provides them in 3.10 *\/\n/s' \
-    "$CORE_FILE"
+awk '
+    /^int clk_enable \(struct clk \*clk\)$/ { skip = 1; n = 0 }
+    skip && /^\{$/ { n++ }
+    !skip { print }
+    skip && /^\}$/ { if (n == 0) { skip = 0 } else { n-- } }
+' "$CORE_FILE" > "$CORE_FILE.new" && mv "$CORE_FILE.new" "$CORE_FILE"
 echo "balong_core_v7r1asic.c: clk_* stubs removed (CCF conflict)"
 
 # BSP_PWC_SLEEPASM.S pulls mach headers that (via balong_v7r1asic.h) reach
