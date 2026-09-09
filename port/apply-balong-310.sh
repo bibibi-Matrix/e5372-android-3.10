@@ -67,6 +67,28 @@ for f in product_config.h vxprintk.h; do
     fi
 done
 
+# linux/sysdev.h was removed in 3.x; balong platform files still #include it
+# (mostly without using it). Provide a minimal empty shim.
+if [ ! -f include/linux/sysdev.h ]; then
+    cat > include/linux/sysdev.h <<'EOF'
+#ifndef __LINUX_SYSDEV_COMPAT_H
+#define __LINUX_SYSDEV_COMPAT_H
+/* sysdev was removed from the kernel; kept as an empty shim for the
+ * Balong 2.6 platform code that still lists it in its includes. */
+#endif
+EOF
+    echo "include/linux/sysdev.h: shim created"
+fi
+if [ ! -f arch/arm/include/asm/leds.h ]; then
+    cat > arch/arm/include/asm/leds.h <<'EOF'
+#ifndef ASM_ARM_LEDS_COMPAT_H
+#define ASM_ARM_LEDS_COMPAT_H
+/* Led event interface was removed; empty shim for Balong platform code. */
+#endif
+EOF
+    echo "asm/leds.h: shim created"
+fi
+
 # --- 3. arch/arm/Kconfig: ARCH_BALONG + source ----------------------------
 if ! grep -q "config ARCH_BALONG" arch/arm/Kconfig; then
     awk '
