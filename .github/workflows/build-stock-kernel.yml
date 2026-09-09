@@ -57,6 +57,7 @@ jobs:
           echo "=== make exit code: $rc ==="
           tail -60 "$GITHUB_WORKSPACE/build.log"
           if [ -f arch/arm/boot/zImage ]; then echo "=== ZIMAGE OK ==="; else echo "=== ZIMAGE MISSING ==="; fi
+          cp -f .config "$GITHUB_WORKSPACE/build.config" 2>/dev/null || true
           exit $rc
       - name: Upload artifacts
         if: always()
@@ -68,4 +69,6 @@ jobs:
             android-2.6.35/vmlinux
             android-2.6.35/.config
             build.log
+            build.config
+            kernel_config.txt
           if-no-files-found: warn
