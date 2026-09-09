@@ -324,11 +324,15 @@ echo "BSP_PWC_SLEEPMGR.c: ioctl -> unlocked_ioctl"
 # -DBOARD_ASIC -DCHIP_BB_6920CS (fixed E5372 / hi6920cs_asic target).
 # Force the mach include dir too: with ARCH_MULTIPLATFORM=y the standard
 # -I$(machdirs)include injection is disabled, so add it unconditionally.
-if ! grep -q "\-DBOARD_ASIC \-DCHIP_BB_6920CS" Makefile; then
+# NB: -D defines must live in KBUILD_CPPFLAGS as well, otherwise .S files
+# (e.g. BSP_PWC_SLEEPASM) are preprocessed without them and hit the balong
+# "#error unknown product macro".
+if ! grep -q "KBUILD_CPPFLAGS += -DBOARD_ASIC -DCHIP_BB_6920CS" Makefile; then
     cat >> Makefile <<'EOF'
 
 # --- balong platform flags (E5372 / hi6920cs_asic) ---
 KBUILD_CFLAGS += -DBOARD_ASIC -DCHIP_BB_6920CS
+KBUILD_CPPFLAGS += -DBOARD_ASIC -DCHIP_BB_6920CS
 KBUILD_CPPFLAGS += -Iarch/arm/mach-balong/include
 KBUILD_CPPFLAGS += -Idrivers/include
 EOF
