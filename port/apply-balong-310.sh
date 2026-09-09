@@ -101,7 +101,45 @@ else
     echo "arch/arm/Makefile: balong machine hook already present"
 fi
 
-# --- 4b. top-level Makefile: balong -D board/chip flags ---------------------
+# --- 4b. compat headers: 2.6-style gic/vic for balong -------------------------
+# 3.10 moved GIC/VIC into drivers/irqchip and dropped the old
+# <asm/hardware/{gic,vic}.h> headers; add thin 2.6-compatible shims so the
+# ported platform code compiles unchanged.
+mkdir -p arch/arm/include/asm/hardware
+if [ ! -f arch/arm/include/asm/hardware/gic.h ]; then
+    cat > arch/arm/include/asm/hardware/gic.h <<'EOF'
+#ifndef __ASM_HARDWARE_GIC_COMPAT_H
+#define __ASM_HARDWARE_GIC_COMPAT_H
+#include <linux/types.h>
+#include <linux/init.h>
+extern void __init gic_init_bases(unsigned int gic_nr, int irq_start,
+				  void __iomem *dist_base, void __iomem *cpu_base,
+				  u32 percpu_offset);
+static inline void __init gic_init(unsigned int start, unsigned int nr,
+				   void __iomem *dist_base,
+				   void __iomem *cpu_base)
+{
+	gic_init_bases(0, start, dist_base, cpu_base, 0);
+}
+#endif
+EOF
+    echo "compat gic.h: created"
+fi
+if [ ! -f arch/arm/include/asm/hardware/vic.h ]; then
+    cat > arch/arm/include/asm/hardware/vic.h <<'EOF'
+#ifndef __ASM_HARDWARE_VIC_COMPAT_H
+#define __ASM_HARDWARE_VIC_COMPAT_H
+#include <linux/types.h>
+#include <linux/init.h>
+extern void __init vic_init(void __iomem *base, unsigned int irq_start,
+			    u32 vic_sources, u32 resume_sources,
+			    struct device_node *node);
+#endif
+EOF
+    echo "compat vic.h: created"
+fi
+
+# --- 4c. top-level Makefile: balong -D board/chip flags ---------------------
 # Vanilla 3.10 does not know BOARD_TYPE/VERSION_TYPE; the GPL features rely on
 # -DBOARD_ASIC -DCHIP_BB_6920CS (fixed E5372 / hi6920cs_asic target).
 # Force the mach include dir too: with ARCH_MULTIPLATFORM=y the standard
