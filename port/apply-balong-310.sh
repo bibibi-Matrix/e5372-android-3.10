@@ -146,6 +146,20 @@ EOF
     echo "asm/leds.h: shim created"
 fi
 
+# mmi.c pulls #include <../include/asm/uaccess.h>, which resolves to a bare
+# include/asm/uaccess.h wrapper; forward it to the real ARM header.
+if [ ! -f include/asm/uaccess.h ]; then
+    mkdir -p include/asm
+    cat > include/asm/uaccess.h <<'EOF'
+#ifndef __BALONG_UACCESS_SHIM_H
+#define __BALONG_UACCESS_SHIM_H
+/* 2.6 balong code used <../include/asm/uaccess.h>; forward to the real one. */
+#include_next <asm/uaccess.h>
+#endif
+EOF
+    echo "include/asm/uaccess.h: shim created"
+fi
+
 # --- 3. arch/arm/Kconfig: ARCH_BALONG + source ----------------------------
 if ! grep -q "config ARCH_BALONG" arch/arm/Kconfig; then
     awk '
