@@ -16,7 +16,7 @@ export CROSS_COMPILE=arm-none-linux-gnueabi-
 echo "=== vexpress_defconfig ==="
 make vexpress_defconfig > /dev/null
 set +e
-make -j2 zImage > "$GITHUB_WORKSPACE/probe-310.log" 2>&1
+make -j2 zImage HOSTCFLAGS="-fcommon" > "$GITHUB_WORKSPACE/probe-310.log" 2>&1
 rc=$?
 set -e
 echo "=== probe make exit: $rc ==="
