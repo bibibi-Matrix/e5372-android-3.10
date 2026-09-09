@@ -86,13 +86,16 @@ fi
 # --- 4b. top-level Makefile: balong -D board/chip flags ---------------------
 # Vanilla 3.10 does not know BOARD_TYPE/VERSION_TYPE; the GPL features rely on
 # -DBOARD_ASIC -DCHIP_BB_6920CS (fixed E5372 / hi6920cs_asic target).
+# Force the mach include dir too: with ARCH_MULTIPLATFORM=y the standard
+# -I$(machdirs)include injection is disabled, so add it unconditionally.
 if ! grep -q "\-DBOARD_ASIC \-DCHIP_BB_6920CS" Makefile; then
     cat >> Makefile <<'EOF'
 
 # --- balong platform flags (E5372 / hi6920cs_asic) ---
 KBUILD_CFLAGS += -DBOARD_ASIC -DCHIP_BB_6920CS
+KBUILD_CPPFLAGS += -Iarch/arm/mach-balong/include
 EOF
-    echo "Makefile: balong -D flags added"
+    echo "Makefile: balong -D flags + mach include added"
 else
     echo "Makefile: balong -D flags already present"
 fi
