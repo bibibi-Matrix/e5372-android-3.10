@@ -58,6 +58,15 @@ for f in BSP_GLOBAL.h BSP_IPF.h BSP_MEMORY.h BSP_VERSION.h DrvInterface.h \
 done
 echo "generated headers: applied"
 
+# 2.6 had bare-name mirrors in include/ (product_config.h is included without a
+# path prefix from <mach/memMapGlobal.h>); 3.10 core does not ship them.
+for f in product_config.h vxprintk.h; do
+    if [ -f "$GPL/include/$f" ] && [ ! -f "include/$f" ]; then
+        cp "$GPL/include/$f" "include/$f"
+        echo "include/$f: mirrored"
+    fi
+done
+
 # --- 3. arch/arm/Kconfig: ARCH_BALONG + source ----------------------------
 if ! grep -q "config ARCH_BALONG" arch/arm/Kconfig; then
     awk '
