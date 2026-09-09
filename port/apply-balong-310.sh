@@ -126,6 +126,20 @@ else
     echo "arch/arm/Kconfig: balong source already present"
 fi
 
+# 3.10 requires ARCH_WANT_OPTIONAL_GPIOLIB to enable CONFIG_GPIOLIB.
+# The 2.6 board selects were '... if GPIOLIB' (recursive) and got stripped; add
+# an unconditional select in the ARCH_BALONG block instead (idempotent insertion).
+awk '
+    /config ARCH_BALONG/ { inbal = 1 }
+    inbal && /select ARM_AMBA/ && !done {
+        print "\tselect ARCH_WANT_OPTIONAL_GPIOLIB"
+        done = 1
+    }
+    inbal && /^config [A-Z_0-9]+/ && !/^config ARCH_BALONG$/ { inbal = 0 }
+    { print }
+' arch/arm/Kconfig > arch/arm/Kconfig.new && mv arch/arm/Kconfig.new arch/arm/Kconfig
+echo "arch/arm/Kconfig: ARCH_BALONG selects ARCH_WANT_OPTIONAL_GPIOLIB"
+
 # --- 4. arch/arm/Makefile: machine hook ------------------------------------
 if ! grep -q "machine-\$(CONFIG_ARCH_BALONG)" arch/arm/Makefile; then
     sed -i '/machine-\$(CONFIG_ARCH_VEXPRESS)/a machine-\$(CONFIG_ARCH_BALONG)\t+= balong' arch/arm/Makefile
