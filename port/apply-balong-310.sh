@@ -296,6 +296,29 @@ perl -0pi -e 's/\n+int clk_enable[^\n]*\n.*?\nvoid clk_put[^\n]*\n\}\n(\n*)/\n/*
     "$CORE_FILE"
 echo "balong_core_v7r1asic.c: clk_* stubs removed (CCF conflict)"
 
+# BSP_DEVICE_EVENT.h publishes its device/key/event enums only under
+# __VXWORKS__; in the 2.6 stock kernel the same Linux definitions lived in a
+# patched <linux/netlink.h> (DEVICE_ID, USB_EVENT, KEY_EVENT, ...). 3.10 vanilla
+# netlink.h lacks them, so carry that block over into BSP_DEVICE_EVENT.h which
+# BSP.h always pulls in for Linux builds.
+DVE=drivers/include/BSP_DEVICE_EVENT.h
+if ! grep -q "^typedef enum _DEVICE_ID$" "$DVE"; then
+    sed -n '/^typedef enum _DEVICE_ID$/,/^extern int device_event_handler_register/p' \
+        "$GPL/include/linux/netlink.h" >> "$DVE"
+    echo "BSP_DEVICE_EVENT.h: device/key event enums appended (from 2.6 netlink.h)"
+else
+    echo "BSP_DEVICE_EVENT.h: event enums already present"
+fi
+
+# BSP_PWC_SLEEPMGR.c: 2.6 .ioctl member does not exist in 3.10 file_operations;
+# convert to unlocked_ioctl (inode param dropped, return long).
+SLEEP_FILE=arch/arm/mach-balong/pwrctrl/sleepMgr/BSP_PWC_SLEEPMGR.c
+sed -i \
+    -e 's/^int PWRCTRL_Ioctl(struct inode \*inode,struct file \*file, unsigned int cmd,unsigned long data)/long PWRCTRL_Ioctl(struct file *file, unsigned int cmd, unsigned long data)/' \
+    -e 's/^\([[:space:]]*\)\.ioctl[[:space:]]*= PWRCTRL_Ioctl,/\1.unlocked_ioctl = PWRCTRL_Ioctl,/' \
+    "$SLEEP_FILE"
+echo "BSP_PWC_SLEEPMGR.c: ioctl -> unlocked_ioctl"
+
 # --- 4e. top-level Makefile: balong -D board/chip flags ---------------------
 # Vanilla 3.10 does not know BOARD_TYPE/VERSION_TYPE; the GPL features rely on
 # -DBOARD_ASIC -DCHIP_BB_6920CS (fixed E5372 / hi6920cs_asic target).
