@@ -1,7 +1,8 @@
 name: build-port-310
-"on":
+on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -21,7 +22,7 @@ jobs:
           tar xjf tc.tar.bz2 -C $HOME
           echo "$HOME/arm-2010q1/bin" >> $GITHUB_PATH
           arm-none-linux-gnueabi-gcc --version | head -1
-      - name: Probe: build vanilla 3.10.108 (vexpress_defconfig)
+      - name: Probe build vanilla 3.10.108 vexpress
         run: bash port/probe-310.sh
       - name: Upload probe log
         if: always()
