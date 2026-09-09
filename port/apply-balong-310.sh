@@ -34,6 +34,15 @@ fi
 sed -i '/select ARCH_WANT_OPTIONAL_GPIOLIB/d' arch/arm/mach-balong/Kconfig
 echo "mach-balong/Kconfig: ARCH_WANT_OPTIONAL_GPIOLIB selects stripped"
 
+# --- 1b. GPL-only global headers used by balong (BSP.h, DrvInterface.h, ...) -
+# The 2.6 tree ships them in drivers/include; vanilla 3.10 has no such dir.
+if [ ! -d drivers/include ]; then
+    cp -r "$GPL/drivers/include" drivers/include
+    echo "drivers/include: copied"
+else
+    echo "drivers/include: already present"
+fi
+
 # --- 2. balong generated headers (FeatureConfig, MemoryMap, BSP_*) --------
 mkdir -p include/generated
 for f in BSP_GLOBAL.h BSP_IPF.h BSP_MEMORY.h BSP_VERSION.h DrvInterface.h \
