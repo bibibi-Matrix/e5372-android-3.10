@@ -296,6 +296,13 @@ perl -0pi -e 's/\n+int clk_enable[^\n]*\n.*?\nvoid clk_put[^\n]*\n\}\n(\n*)/\n/*
     "$CORE_FILE"
 echo "balong_core_v7r1asic.c: clk_* stubs removed (CCF conflict)"
 
+# BSP_PWC_SLEEPASM.S pulls mach headers that (via balong_v7r1asic.h) reach
+# 3.10's asm/irqflags.h, which is full of open-coded C static inline functions
+# with no __ASSEMBLY__ guard; preprocessing them into assembly breaks gas.
+sed -i 's/^#ifdef __KERNEL__/#if defined(__KERNEL__) \&\& !defined(__ASSEMBLY__)/' \
+    arch/arm/include/asm/irqflags.h
+echo "asm/irqflags.h: __KERNEL__ block made assembly-safe"
+
 # BSP_DEVICE_EVENT.h publishes its device/key/event enums only under
 # __VXWORKS__; in the 2.6 stock kernel the same Linux definitions lived in a
 # patched <linux/netlink.h> (DEVICE_ID, USB_EVENT, KEY_EVENT, ...). 3.10 vanilla
