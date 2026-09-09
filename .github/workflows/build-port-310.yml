@@ -49,6 +49,15 @@ jobs:
           tar xjf tc.tar.bz2 -C $HOME
           echo "$HOME/arm-2010q1/bin" >> $GITHUB_PATH
           arm-none-linux-gnueabi-gcc --version | head -1
+      - name: Download GPL source from Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download gpl-test --pattern "*.tar.gz" --clobber
+          ls -la gpl.tar.gz 2>/dev/null || ls -la E5372_GPL_Code.tar.gz
+          7z x *.tar.gz -y >/dev/null 2>&1 || true
+          7z x *.tar -y >/dev/null 2>&1 || true
+          test -d android-2.6.35 && echo "GPL extracted OK"
       - name: Apply balong layer and build
         run: bash port/build-balong-310.sh
       - name: Upload balong build log

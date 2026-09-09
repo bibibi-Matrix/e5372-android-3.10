@@ -6,7 +6,7 @@ set -euo pipefail
 
 K310_URL="https://cdn.kernel.org/pub/linux/kernel/v3.x/linux-3.10.108.tar.xz"
 cd "$GITHUB_WORKSPACE"
-GPL="$GITHUB_WORKSPACE/gpl_source/android-2.6.35"
+GPL="$GITHUB_WORKSPACE/android-2.6.35"
 
 curl -sL -o k310.tar.xz "$K310_URL"
 tar xf k310.tar.xz
