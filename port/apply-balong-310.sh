@@ -29,6 +29,11 @@ else
     echo "mach-balong: already present"
 fi
 
+# 3.10 Kconfig: GPIOLIB already depends on ARCH_WANT_OPTIONAL_GPIOLIB; the 2.6
+# board 'select ARCH_WANT_OPTIONAL_GPIOLIB' lines create a recursive cycle.
+sed -i '/select ARCH_WANT_OPTIONAL_GPIOLIB/d' arch/arm/mach-balong/Kconfig
+echo "mach-balong/Kconfig: ARCH_WANT_OPTIONAL_GPIOLIB selects stripped"
+
 # --- 2. balong generated headers (FeatureConfig, MemoryMap, BSP_*) --------
 mkdir -p include/generated
 for f in BSP_GLOBAL.h BSP_IPF.h BSP_MEMORY.h BSP_VERSION.h DrvInterface.h \
@@ -52,7 +57,6 @@ if ! grep -q "config ARCH_BALONG" arch/arm/Kconfig; then
             print "\tbool \"Hisilicon Balong family\""
             print "\tselect ARM_AMBA"
             print "\tselect GENERIC_CLOCKEVENTS"
-            print "\tselect ARCH_WANT_OPTIONAL_GPIOLIB if GPIOLIB"
             print "\thelp"
             print "\t\tThis enables support for Hisilicon(R) Balong(R) boards."
             print ""

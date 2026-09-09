@@ -23,6 +23,7 @@ make vexpress_defconfig > /dev/null
 echo "=== switch platform to ARCH_BALONG ==="
 scripts/config \
     --disable ARCH_VEXPRESS \
+    --disable ARCH_MULTIPLATFORM \
     --enable ARCH_BALONG \
     --enable ARCH_SOC_VERSION_V7R1_C00 \
     --enable MACH_BOARD_ES \
@@ -32,6 +33,11 @@ scripts/config \
     --enable HAS_BALONG_DEBUG_UART_PHYS \
     --enable BALONG_DEBUG_UART0
 make olddefconfig
+
+echo "=== sanity checks ==="
+grep -E "^(CONFIG_ARCH_BALONG|CONFIG_ARCH_MULTIPLATFORM|CONFIG_MACH_BOARD_ES|CONFIG_ARCH_SOC_VERSION_V7R1_C00)=" .config || true
+ls -la arch/arm/mach-balong/include/mach/ | head -5
+test -f arch/arm/mach-balong/include/mach/lm.h && echo "lm.h present" || echo "lm.h MISSING"
 
 set +e
 make -j4 zImage HOSTCFLAGS="-fcommon" \
