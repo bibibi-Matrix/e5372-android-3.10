@@ -161,7 +161,30 @@ EOF
     echo "compat vic.h: created"
 fi
 
-# --- 4c. top-level Makefile: balong -D board/chip flags ---------------------
+# --- 4d. machine_desc / mem-types compatibility for 3.10 ----------------------
+# 3.10 dropped .phys_io/.io_pg_offst/.boot_params/.timer, replaced sys_timer by
+# .init_time, renamed MT_MEMORY_NONCACHED_READ_ONLY, and does not know the
+# BALONG_V100R001 machine id (3339 from the 2.6 mach-types.h).
+MACH_FILE=arch/arm/mach-balong/balong_v7r1asic.c
+sed -i \
+    -e 's/MT_MEMORY_NONCACHED_READ_ONLY/MT_MEMORY_NONCACHED/g' \
+    -e '/static struct sys_timer pv500v1_timer = {/,/^};/d' \
+    -e '/\.phys_io[[:space:]]*=/d' \
+    -e '/\.io_pg_offst[[:space:]]*=/d' \
+    -e 's/\.boot_params[[:space:]]*=/ .atag_offset =/' \
+    -e 's/\.timer[[:space:]]*=[[:space:]]*&pv500v1_timer,/ .init_time = pv500v1_timer_init,/' \
+    "$MACH_FILE"
+echo "balong_v7r1asic.c: 3.10 machine_desc cleanups applied"
+
+if ! grep -q "BALONG_V100R001" arch/arm/tools/mach-types; then
+    printf 'balong_v100r001\tARCH_BALONG_V100R001\t\tBALONG_V100R001\t\t3339\n' \
+        >> arch/arm/tools/mach-types
+    echo "arch/arm/tools/mach-types: BALONG_V100R001=3339 added"
+else
+    echo "arch/arm/tools/mach-types: BALONG_V100R001 already present"
+fi
+
+# --- 4e. top-level Makefile: balong -D board/chip flags ---------------------
 # Vanilla 3.10 does not know BOARD_TYPE/VERSION_TYPE; the GPL features rely on
 # -DBOARD_ASIC -DCHIP_BB_6920CS (fixed E5372 / hi6920cs_asic target).
 # Force the mach include dir too: with ARCH_MULTIPLATFORM=y the standard
