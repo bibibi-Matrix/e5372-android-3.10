@@ -28,3 +28,7 @@ __pycache__/
 workdir/
 out/
 *.log
+
+# Vanilla 3.10 kernel tree (huge, re-download via CI)
+linux-3.10/
+
