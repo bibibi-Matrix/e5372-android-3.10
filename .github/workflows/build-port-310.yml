@@ -1,7 +1,7 @@
-name: port-310
-on:
+name: build-port-310
+"on":
   push:
-    branches: [main]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
