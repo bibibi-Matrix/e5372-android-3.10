@@ -303,6 +303,15 @@ sed -i 's/^#ifdef __KERNEL__/#if defined(__KERNEL__) \&\& !defined(__ASSEMBLY__)
     arch/arm/include/asm/irqflags.h
 echo "asm/irqflags.h: __KERNEL__ block made assembly-safe"
 
+# ...and 3.10's asm/system.h drags C-only cmpxchg.h/switch_to.h into the .S
+# preprocessing; the .S needs none of it (its I_BIT/MODE_*/CTRL_* come from
+# balong's own BSP_PWC_SLEEPASM.h/BSP_PWC_SOCREG.h), so drop that include.
+SLEEPASM_S=arch/arm/mach-balong/pwrctrl/sleepMgr/v7r1/BSP_PWC_SLEEPASM.S
+if grep -q '#include <asm/system.h>' "$SLEEPASM_S"; then
+    sed -i '/#include <asm\/system.h>/d' "$SLEEPASM_S"
+    echo "BSP_PWC_SLEEPASM.S: dropped asm/system.h (C-only chain)"
+fi
+
 # BSP_DEVICE_EVENT.h publishes its device/key/event enums only under
 # __VXWORKS__; in the 2.6 stock kernel the same Linux definitions lived in a
 # patched <linux/netlink.h> (DEVICE_ID, USB_EVENT, KEY_EVENT, ...). 3.10 vanilla
