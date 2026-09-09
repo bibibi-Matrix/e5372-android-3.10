@@ -362,6 +362,102 @@ else
     echo "Makefile: balong -D flags already present"
 fi
 
+# --- 4h. weak stubs for not-yet-ported balong drivers -----------------------
+# bsp_hw_adapt.c / sleepMgr / mmi reference the stock 2.6 driver APIs of the
+# balong charger, wlan_if, mmc-core (sd_*), tft/led, rtc, nvim, udi and IC core
+# files that are NOT part of this port yet.  Until those trees are ported and
+# built, satisfy the linker with weak stubs (real driver ports will then simply
+# override them). timer_tick() gone in 3.10 too.
+STUBS=arch/arm/mach-balong/balong_stubs.c
+cat > "$STUBS" <<'EOF'
+/* Weak stubs for balong APIs not yet ported to 3.10 (see apply-balong-310.sh 4h) */
+#include <linux/kernel.h>
+
+#define W __attribute__((weak))
+
+W int  balong_breath_get_status(void)                       { return 0; }
+W long balong_breath_led_ioctl(void)                        { return 0; }
+W int  balong_breath_temp_enable(void)                      { return 0; }
+W int  balong_rtc_alarm_set(void)                           { return 0; }
+W long balong_tft_ioctl(void)                               { return 0; }
+W int  BCM43239_WIFI_PWRCTRL_RESUME(void)                   { return 0; }
+W int  BCM43239_WIFI_PWRCTRL_SUSPEND(void)                  { return 0; }
+W int  BSP_CHG_ChargingStatus(void)                         { return 0; }
+W int  BSP_CHG_GetBatteryState(void)                        { return 0; }
+W int  BSP_CHG_GetCbcState(void)                            { return 0; }
+W int  BSP_CHG_PollTimerSet(void)                           { return 0; }
+W int  BSP_CHG_StateSet(void)                               { return 0; }
+W int  BSP_CHG_VoltGet(void)                                { return 0; }
+W int  BSP_GetExtChgSta(void)                               { return 0; }
+W int  BSP_ICC_CanSleep(void)                               { return 0; }
+W int  BSP_IFC_CanSleep(void)                               { return 0; }
+W int  BSP_IFC_RegFunc(void)                                { return 0; }
+W int  BSP_IFC_Send(void)                                   { return 0; }
+W int  BSP_IFCP_RegFunc(void)                               { return 0; }
+W int  BSP_IPC_IntConnect(void)                             { return 0; }
+W int  BSP_IPC_IntDisable(void)                             { return 0; }
+W int  BSP_IPC_IntEnable(void)                              { return 0; }
+W int  BSP_IPC_IntSend(void)                                { return 0; }
+W int  BSP_IPC_SemCreate(void)                              { return 0; }
+W int  BSP_IPC_SemGive(void)                                { return 0; }
+W int  BSP_IPC_SemTake(void)                                { return 0; }
+W int  BSP_IPC_SpinLock(void)                               { return 0; }
+W int  BSP_IPC_SpinUnLock(void)                             { return 0; }
+W unsigned long BSP_WifiDataReservedTail(void)              { return 0; }
+W int  device_event_report(void)                            { return 0; }
+W int  dwc_otg_discharge_close(void)                        { return 0; }
+W int  dwc_otg_discharge_open(void)                         { return 0; }
+W void *exchMemMalloc(void)                                 { return 0; }
+W void *g_stMspRegFunc;                                     /* data */
+W int  get_current_working_time(void)                       { return 0; }
+W int  hw_dwc_otg_is_device_mode(void)                      { return 0; }
+W int  is_current_firmware_factory(void)                    { return 0; }
+W int  LcdReInit(void)                                      { return 0; }
+W int  NVM_Read(void)                                       { return 0; }
+W int  NVM_Write(void)                                      { return 0; }
+W struct { unsigned int ulPowerOffMaxTimes, ulMaxTime, ulVoltLevel1,
+           ulVoltLevel2, ulRTCLevel1, ulRTCLevel2, ulRTCLevel3;
+         } s_shortOnOffConfig;                              /* data */
+W int  sd_get_capacity(void)                                { return 0; }
+W int  sd_get_status(void)                                  { return 0; }
+W int  sd_mmc_get_status(void)                              { return 0; }
+W int  sd_multi_transfer(void)                              { return 0; }
+W int  sd_sg_init_table(void)                               { return 0; }
+W int  sd_transfer(void)                                    { return 0; }
+W int  systemError(void)                                    { return 0; }
+W int  tftClearWholeScreen(void)                            { return 0; }
+W int  tftLight(void)                                       { return 0; }
+W int  tftPwrOff(void)                                      { return 0; }
+W int  tftRefreshByBit(void)                                { return 0; }
+W int  tftStringDisplay(void)                               { return 0; }
+W int  tftUpdateDisplay(void)                               { return 0; }
+W void timer_tick(void)                                     { }
+W int  udi_close(void)                                      { return 0; }
+W long udi_ioctl(void)                                      { return 0; }
+W int  udi_open(void)                                       { return 0; }
+W int  udi_read(void)                                       { return 0; }
+W int  udi_write(void)                                      { return 0; }
+W int  WiFi_DrvClearRxFlowCtrl(void)                        { return 0; }
+W int  WiFi_DrvSetRxFlowCtrl(void)                          { return 0; }
+W int  wifi_get_pa_cur_mode(void)                           { return 0; }
+W int  wifi_get_rx_detail_report(void)                      { return 0; }
+W int  wifi_get_rx_packet_report(void)                      { return 0; }
+W int  wifi_get_sta_num(void)                               { return 0; }
+W int  wifi_get_status(void)                                { return 0; }
+W int  wifi_get_tcmd_mode(void)                             { return 0; }
+W int  wifi_power_off(void)                                 { return 0; }
+W int  wifi_power_off_full(void)                            { return 0; }
+W int  wifi_power_on(void)                                  { return 0; }
+W int  wifi_set_pa_mode(void)                               { return 0; }
+W int  wifi_tcmd(void)                                      { return 0; }
+EOF
+echo "balong_stubs.c: weak stubs for unported driver APIs written"
+
+if ! grep -q "balong_stubs.o" arch/arm/mach-balong/Makefile; then
+    printf 'obj-y += balong_stubs.o\n' >> arch/arm/mach-balong/Makefile
+    echo "mach-balong/Makefile: balong_stubs.o added"
+fi
+
 # --- 5. minimal defconfig ---------------------------------------------------
 if [ ! -f arch/arm/configs/balong_min_defconfig ]; then
     cat > arch/arm/configs/balong_min_defconfig <<'EOF'
